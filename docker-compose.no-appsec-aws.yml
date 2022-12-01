@@ -1,0 +1,21 @@
+version: '3.8'
+secrets:
+  ld_api_key:
+    external: true
+  dd_api_key:
+    external: true
+services:
+  app-node:
+    image: travel_dog:latest
+    container_name: app-node
+    ports:
+      - "80:80"
+    volumes:
+      - ".:/app"
+      - "~/.aws:/root/.aws"
+    env_file:
+      - .env
+    command: poetry run python3 app.py
+    environment:
+      FLASK_info: 1
+      SEED: True

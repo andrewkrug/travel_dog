@@ -1,0 +1,44 @@
+version: '3.8'
+secrets:
+  ld_api_key:
+    external: true
+  dd_api_key:
+    external: true
+services:
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory"
+    image: "public.ecr.aws/mobileup/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+  app-node:
+    image: travel_dog:latest
+    container_name: app-node
+    ports:
+      - "80:80"
+    depends_on:
+      - "dynamodb-local"
+    links:
+      - "dynamodb-local"
+      - "metadata-mock"
+    volumes:
+      - ".:/app"
+    env_file:
+      - .env
+    command: poetry run python3 app.py
+    environment:
+      AWS_ACCESS_KEY_ID: 'DUMMYIDEXAMPLE'
+      AWS_SECRET_ACCESS_KEY: 'DUMMYEXAMPLEKEY'
+      AWS_REGION: 'eu-west-1'
+      DYNAMO_LOCAL_PORT: 8000
+      DYNAMO_LOCAL_HOST: dynamodb-local
+      DYNAMO_ENABLE_LOCAL: True
+      FLASK_info: 1
+      SEED: True
+  metadata-mock:
+    image: public.ecr.aws/aws-ec2/amazon-ec2-metadata-mock:v1.11.2
+    ports: 
+      - 1338:1338

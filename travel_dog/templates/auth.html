@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{% block title %}Welcome to Travel Dog{% endblock %}</h1>
+  <p> Where dogs share their most and least dog friendly travel places.</p>
+
+  <div class="container-fluid">
+    {% if user == None %}
+    <h1>Please login</h1>
+    <h3>Now with zero trust passwordless login. Simply put your username and press your paw.</h3>
+    <br>
+    <form action="" method="get">
+      <input type="text" placeholder="Username" name="username">
+      <input class="btn btn-primary" type="submit" value="Login">
+    </form>
+    {% if error != None %}
+      <h4>{{error}}</h4>
+    {% endif %}
+    {% else %}
+    <h1>You are already signed in as: {{user}}.  Please sign out.</h1>
+    <form action="" method="get">
+        <input type="hidden" placeholder="Username" name="username" value="logout">
+        <input class="btn btn-primary" type="submit" value="Logout">
+    </form>
+    {% endif %}
+  </div>
+
+{% endblock %}

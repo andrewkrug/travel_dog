@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h1>Welcome to {{profile['username']}}'s Travel Profile</h1>
+        <h3>{{profile['given_name']}} {{profile['surname']}} is a pretty awesome doggo!  They enjoy visiting {{profile['favorite_location_url']}}.</h3>
+        <img src="/static/custom-locations/{{safe_img_name}}.png"></img>
+        <br></br>
+        Just take a good long look at this location!  Have you ever seen a more beautiful thing?
+    </div>
+{% endblock %}

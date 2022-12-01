@@ -1,0 +1,76 @@
+version: '3.8'
+secrets:
+  ld_api_key:
+    external: true
+  dd_api_key:
+    external: true
+services:
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory"
+    image: "public.ecr.aws/mobileup/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+  app-node:
+    image: travel_dog:latest
+    container_name: app-node
+    command: poetry run ddtrace-run gunicorn --bind 0.0.0.0:80 wsgi:app
+    ports:
+      - "80:80"
+    depends_on:
+      - "dynamodb-local"
+    links:
+      - "dynamodb-local"
+      - "metadata-mock"
+    volumes:
+      - ".:/app"
+    env_file:
+      - .env
+    environment:
+      AWS_ACCESS_KEY_ID: 'DUMMYIDEXAMPLE'
+      AWS_SECRET_ACCESS_KEY: 'DUMMYEXAMPLEKEY'
+      AWS_REGION: 'eu-west-1'
+      DYNAMO_LOCAL_PORT: 8000
+      DYNAMO_LOCAL_HOST: dynamodb-local
+      DYNAMO_ENABLE_LOCAL: True
+      FLASK_info: 1
+      SEED: True
+      DD_APPSEC_ENABLED: True
+      DD_TRACE_AGENT_PORT: 8126
+      DD_AGENT_HOST: agent
+      DD_LOGS_INJECTION: true
+      DD_ENV: development
+      DD_SERVICE: travel_dog
+      DD_VERSION: 2.1.1
+    labels:
+      com.datadoghq.tags.env: development
+      com.datadoghq.tags.service: travel_dog
+      com.datadoghq.tags.version: 2.1.1
+      com.datadoghq.ad.logs: '[{"source": "python", "service": "travel_dog"}]'
+  metadata-mock:
+    network_mode: "bridge"
+    image: public.ecr.aws/aws-ec2/amazon-ec2-metadata-mock:v1.11.2
+    ports: 
+      - 1338:1338
+  agent:
+    image: "datadog/agent:7.40.1"
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_PROCESS_AGENT_ENABLED=true
+      - DD_DOCKER_LABELS_AS_TAGS={"my.custom.label.team":"team"}
+      - DD_TAGS='env:development'
+    ports:
+      - "8126:8126"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+    labels:
+      com.datadoghq.ad.logs: '[{"source": "agent", "service": "agent"}]'

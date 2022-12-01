@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{% block title %}Welcome to Travel Dog{% endblock %}</h1>
+
+  {% if flash != None %}
+  <h1> {{ flash }} </h1>
+  {% else %}
+  <p> Where dogs share their most and least dog friendly travel places.</p>
+  {% endif %}
+
+  <div class="container-fluid">
+    {% for user_row in users %} 
+        <div class="row">
+          <div class="col-sm">
+          {% if adversary == False %}
+          <img width="320" height="240" src="static/dogs/{{user_row[0]['favorite_location_img']}}"></img>
+          {% else %}
+          <img width="320" height="240" src="{{user_row[0]['favorite_location_img']}}"></img>
+          {% endif %}
+          <p>{{user_row[0]['username']}}</p>
+          </div>
+    {% endfor %}
+  </div>
+
+{% endblock %}

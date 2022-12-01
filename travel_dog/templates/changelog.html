@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{% block title %}Welcome to Travel Dog{% endblock %}</h1>
+  <p> Where dogs share their most and least dog friendly travel places.</p>
+
+  <div class="container-fluid">
+    {{ mkd_text|markdown }}
+  </div>
+
+{% endblock %}

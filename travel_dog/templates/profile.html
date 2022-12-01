@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container-fluid">
+        <p> Profile editing is a beta feature.  Please be aware 100% of functionality hasn't been built out.</p>
+        <form action="/profile" method="get">
+            Username: <input type="text" placeholder="Username" name="username" value="{{profile['username']}}"><br></br>
+            Favorite Travel Site: <input type="text" placeholder="favorite_location_url" name="favorite_location_url" value="{{profile['favorite_location_url']}}"><br></br>
+            Given Name: <input type="text" placeholder="given_name" name="given_name" value="{{profile['given_name']}}"><br></br>
+            Surname: <input type="text" placeholder="surname" name="surname" value="{{profile['surname']}}"><br></br>
+            <input class="btn btn-primary" type="submit" value="Update">
+        </form>
+    </div>
+{% endblock %}
